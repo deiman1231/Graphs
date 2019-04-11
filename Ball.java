@@ -1,9 +1,12 @@
+import java.lang.Math;
+import java.awt.MouseInfo;
+
 /**
  * Models a simple solid sphere. 
  * This class represents a Ball object. When combined with the GameArena class,
  * instances of the Ball class can be displayed on the screen.
  */
-public class Ball 
+public class Ball // TODO: rename to node
 {
     // The following instance variables define the information needed to represent a Ball
     // Feel free to more instance variables if you think it will support your work... 
@@ -105,6 +108,16 @@ public class Ball
     public void setColour(String c)
     {
         colour = c;
+    }
+
+    /** 
+     * Determines if we can put a ball in that place where the mouse is.
+     * @param ball1 Ball which we will check the distance.
+     * @return true if we can, false we cannot.
+     */
+    public boolean ballDistChecker(double x, double y)
+    {
+        return (Math.abs(xPosition - x) > 50 || Math.abs(yPosition - y) > 30);
     }
 
     /**

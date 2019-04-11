@@ -11,6 +11,7 @@ public class Driver
         while(true)
         {
             a.update();
+            //System.out.println(MouseInfo.getPointerInfo().getLocation().getX() + "   " + MouseInfo.getPointerInfo().getLocation().getY());
         }
     }
 }

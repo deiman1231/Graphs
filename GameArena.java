@@ -20,7 +20,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-
 /**
  * This class provides a simple window in which grahical objects can be drawn. 
  *
@@ -36,7 +35,8 @@ import java.awt.event.MouseListener;
  */
 public class GameArena 
 {
-	
+	Random random = new Random();
+    
     // Size of window
 	private int arenaWidth;
 	private int arenaHeight;
@@ -44,7 +44,9 @@ public class GameArena
 
 	private boolean exiting = false;
     private final static int MAXIMUM_OBJECTS = 100000;
-    private Ball ball;
+    private int Number_Of_Balls = 0;
+    private Ball[] ball = new Ball[MAXIMUM_OBJECTS]; // TODO: rename to balls
+    private boolean addedball = false;
 
     // Collections of primitives. These now relate 1:1 to JavaFX Nodes, since moving from AWT.
     private List<Object> addList = new ArrayList<Object>();
@@ -131,11 +133,38 @@ public class GameArena
             }
         });
 	}
+    
+    
     public class myMouseListener implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e){
-            ball = new Ball(MouseInfo.getPointerInfo().getLocation().getX(), MouseInfo.getPointerInfo().getLocation().getY(), 20, "GREEN");
-            addBall(ball);
+            double x = MouseInfo.getPointerInfo().getLocation().getX();
+            double y = MouseInfo.getPointerInfo().getLocation().getY()-20;
+            int s = 0;
+            if(Number_Of_Balls == 0){
+                ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
+                addBall(ball[Number_Of_Balls]);
+                Number_Of_Balls++;
+            }
+            for(int i = 0; i < Number_Of_Balls; i++){
+                System.out.println(Math.abs(ball[i].getXPosition() - x)+ " " + Math.abs(ball[i].getYPosition() - y));
+                if(ball[i].ballDistChecker(x, y)){
+                    s++;
+                    
+                }
+            }
+            System.out.println(s);
+            if(s == Number_Of_Balls){
+                ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
+                addBall(ball[Number_Of_Balls]);
+                addedball = true;                     
+            }
+            if(addedball)
+            {
+                Number_Of_Balls++;
+                addedball = false;
+            }
+
         }
         @Override
         public void mouseEntered(MouseEvent e){
@@ -168,8 +197,6 @@ public class GameArena
                     right = true;
                 if (keyEvent.getCode() == KeyCode.SPACE) 
                     space = true;
-                //if (keyEvent.getCode() == KeyCode.RButton)
-                    //mouse = true;
             }
         };
 
@@ -185,8 +212,6 @@ public class GameArena
                     right = false;
                 if (keyEvent.getCode() == KeyCode.SPACE) 
                     space = false;
-                // if (keyEvent.getCode() == KeyCode.RButton)
-                //     mouse = false;
             }
         };
 
@@ -658,7 +683,7 @@ public class GameArena
 	{
 		return space;
 	}
-
+    
     /** 
      * Acquires the JPanel containing this GameArena.
      * @return The JPanel object containing this GameArena.

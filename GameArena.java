@@ -144,13 +144,18 @@ public class GameArena
             double y = MouseInfo.getPointerInfo().getLocation().getY()-20;
             if(Number_Of_Balls == 0){
                 ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
+                text[Number_Of_Balls] = new Text(String.valueOf(Number_Of_Balls), x-7.5, y+7.5, 20, "BLACK");
                 addBall(ball[Number_Of_Balls]);
+                addText(text[Number_Of_Balls]);
                 Number_Of_Balls++;
+                
             }
             s = checkDontOverlap(s, x, y);
             if(s == Number_Of_Balls){
                 ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
+                text[Number_Of_Balls] = new Text(String.valueOf(Number_Of_Balls), x-7.5, y+7.5, 20, "BLACK");
                 addBall(ball[Number_Of_Balls]);
+                addText(text[Number_Of_Balls]);
                 addedball = true;                     
             }
             if(addedball)

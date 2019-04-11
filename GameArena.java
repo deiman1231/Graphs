@@ -4,6 +4,7 @@ import java.util.concurrent.locks.*;
 import javafx.scene.input.KeyEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javafx.application.Platform;
 import javafx.animation.AnimationTimer;
@@ -47,6 +48,7 @@ public class GameArena
     private int Number_Of_Balls = 0;
     private Ball[] ball = new Ball[MAXIMUM_OBJECTS]; // TODO: rename to balls
     private boolean addedball = false;
+    private Text text[] = new Text[MAXIMUM_OBJECTS];
 
     // Collections of primitives. These now relate 1:1 to JavaFX Nodes, since moving from AWT.
     private List<Object> addList = new ArrayList<Object>();
@@ -72,7 +74,6 @@ public class GameArena
     private ReentrantLock renderLock;
     private boolean initialised;
     private boolean rendered;
-
 	/**
      * Constructor. Creates an instance of the GameArena class, and displays a window on the
      * screen upon which shapes can be drawn.
@@ -108,7 +109,7 @@ public class GameArena
         myMouseListener m = new myMouseListener();
         jfxPanel.addMouseListener(m);
         jfxPanel.setPreferredSize(new java.awt.Dimension(width, height));
-
+        jfxPanel.setLayout(null);
         // Create a window, if necessary.
         if (createWindow)
         {
@@ -138,22 +139,15 @@ public class GameArena
     public class myMouseListener implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e){
+            int s = 0;
             double x = MouseInfo.getPointerInfo().getLocation().getX();
             double y = MouseInfo.getPointerInfo().getLocation().getY()-20;
-            int s = 0;
             if(Number_Of_Balls == 0){
                 ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
                 addBall(ball[Number_Of_Balls]);
                 Number_Of_Balls++;
             }
-            for(int i = 0; i < Number_Of_Balls; i++){
-                System.out.println(Math.abs(ball[i].getXPosition() - x)+ " " + Math.abs(ball[i].getYPosition() - y));
-                if(ball[i].ballDistChecker(x, y)){
-                    s++;
-                    
-                }
-            }
-            System.out.println(s);
+            s = checkDontOverlap(s, x, y);
             if(s == Number_Of_Balls){
                 ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
                 addBall(ball[Number_Of_Balls]);
@@ -593,7 +587,22 @@ public class GameArena
             removeList.add(r);
 		}
 	}
-
+    /**
+     * Calculates how many balls dont overlap with our ball that we want to put.
+     * @param dontOverlap integer how many balls dont overlap.
+     * @param x mouse x coordinates.
+     * @param y mouse y coordinates.
+     * @return integer how many balls dont overlap.
+     */
+    public int checkDontOverlap(int dontOverlap, double x, double y)
+    {
+        for(int i = 0; i < Number_Of_Balls; i++){
+            if(ball[i].ballDistChecker(x, y)){
+                dontOverlap++;
+            }
+        }
+        return dontOverlap;
+    }
   	/**
      * Update the window to reflect all graphical objects added to this GameArena.
      *

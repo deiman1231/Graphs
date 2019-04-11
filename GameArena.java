@@ -15,7 +15,11 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 
+import java.awt.MouseInfo;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 
 /**
  * This class provides a simple window in which grahical objects can be drawn. 
@@ -32,13 +36,15 @@ import java.awt.event.WindowEvent;
  */
 public class GameArena 
 {
-	// Size of window
+	
+    // Size of window
 	private int arenaWidth;
 	private int arenaHeight;
     private JFrame window;
 
 	private boolean exiting = false;
     private final static int MAXIMUM_OBJECTS = 100000;
+    private Ball ball;
 
     // Collections of primitives. These now relate 1:1 to JavaFX Nodes, since moving from AWT.
     private List<Object> addList = new ArrayList<Object>();
@@ -97,6 +103,8 @@ public class GameArena
 
         // Create a JavaFX canvas as a Swing panel.
         jfxPanel = new JFXPanel();
+        myMouseListener m = new myMouseListener();
+        jfxPanel.addMouseListener(m);
         jfxPanel.setPreferredSize(new java.awt.Dimension(width, height));
 
         // Create a window, if necessary.
@@ -123,7 +131,29 @@ public class GameArena
             }
         });
 	}
-
+    public class myMouseListener implements MouseListener{
+        @Override
+        public void mouseClicked(MouseEvent e){
+            ball = new Ball(MouseInfo.getPointerInfo().getLocation().getX(), MouseInfo.getPointerInfo().getLocation().getY(), 20, "GREEN");
+            addBall(ball);
+        }
+        @Override
+        public void mouseEntered(MouseEvent e){
+            
+        }
+        @Override
+        public void mouseExited(MouseEvent e){
+            
+        }
+        @Override
+        public void mousePressed(MouseEvent e){
+            
+        }
+        @Override
+        public void mouseReleased(MouseEvent e){
+            
+        }
+    }
    private void initFX() {
 
         EventHandler<KeyEvent> keyDownHandler = new EventHandler<KeyEvent>() {
@@ -138,6 +168,8 @@ public class GameArena
                     right = true;
                 if (keyEvent.getCode() == KeyCode.SPACE) 
                     space = true;
+                //if (keyEvent.getCode() == KeyCode.RButton)
+                    //mouse = true;
             }
         };
 
@@ -153,6 +185,8 @@ public class GameArena
                     right = false;
                 if (keyEvent.getCode() == KeyCode.SPACE) 
                     space = false;
+                // if (keyEvent.getCode() == KeyCode.RButton)
+                //     mouse = false;
             }
         };
 
@@ -168,7 +202,6 @@ public class GameArena
             }
         }.start();
     }
-
 	/**
 	 * Close this GameArena window.
 	 * 

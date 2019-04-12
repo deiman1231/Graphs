@@ -1,16 +1,29 @@
 import javax.swing.*;
+import java.awt.event.*;
 import java.awt.*;
+import java.util.*;
 
-public class Connections
+public class Connections implements ActionListener
 {
+    private JButton button;
+    private JButton button1;
+    private JTextField textfield;
+    private JTextField textfield1;
+    public GameArena arena;
+    private int count;
+
     public Connections(){
+
+        arena = new GameArena(500,500);
         JFrame window = new JFrame("Connections");
         JPanel panel = new JPanel();
-        JButton button = new JButton("Simple Connection");
-        JButton button1 = new JButton("Direct Connection");
-        JTextField textfield = new JTextField("Nodes number", 15);
-        JTextField textfield1 = new JTextField("Nodes number", 15);
+        button = new JButton("Undirected Connection");
+        button1 = new JButton("Direct Connection");
+        textfield = new JTextField("Nodes number", 15);
+        textfield1 = new JTextField("Nodes number", 15);
         FlowLayout f = new FlowLayout();
+        button.addActionListener(this);
+        button1.addActionListener(this);
 
         panel.setLayout(f);
         panel.add(button);
@@ -22,5 +35,27 @@ public class Connections
         window.setSize(300, 200);
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+        String linkNameStart = textfield.getText();
+        String linkNameEnd = textfield1.getText();
+        System.out.println(linkNameStart + " " + linkNameEnd);
+        Ball linkStart = null;
+        Ball linkEnd = null;
+
+        for (int i = 0; i < arena.nodes.size(); i++){
+            System.out.println(arena.nodes.get(i).text.getText() + "?=" + linkNameStart);
+            if (arena.nodes.get(i).text.getText().equals(linkNameStart))
+                linkStart = arena.nodes.get(i);
+            if (arena.nodes.get(i).text.getText().equals(linkNameEnd))
+                linkEnd = arena.nodes.get(i);
+        }
+        if(e.getSource() == button){
+            arena.adj.get(linkStart.index).add(linkEnd);
+            arena.adj.get(linkEnd.index).add(linkStart);
+            Line line = new Line(linkStart.getXPosition(), linkStart.getYPosition(), linkEnd.getXPosition(), linkEnd.getYPosition(), 5, "WHITE");
+            arena.addLine(line);
+        }
     }
 }

@@ -45,8 +45,9 @@ public class GameArena
 
 	private boolean exiting = false;
     private final static int MAXIMUM_OBJECTS = 100000;
-    private int Number_Of_Balls = 0;
-    private Ball[] ball = new Ball[MAXIMUM_OBJECTS]; // TODO: rename to balls
+    public List<Ball> nodes;
+    public List<HashSet<Ball>> adj;
+
     private boolean addedball = false;
     private Text text[] = new Text[MAXIMUM_OBJECTS];
 
@@ -101,6 +102,9 @@ public class GameArena
         this.initialised = false;
         this.rendered = false;
 
+        nodes = new LinkedList<Ball>();
+        adj = new LinkedList<HashSet<Ball>>();
+
         // Create a lock to reduce flicker on rendering
         renderLock = new ReentrantLock();
 
@@ -135,52 +139,36 @@ public class GameArena
         });
 	}
     
-    
     public class myMouseListener implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e){
-            int s = 0;
-            double x = MouseInfo.getPointerInfo().getLocation().getX();
-            double y = MouseInfo.getPointerInfo().getLocation().getY()-20;
-            if(Number_Of_Balls == 0){
-                ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
-                text[Number_Of_Balls] = new Text(String.valueOf(Number_Of_Balls), x-7.5, y+7.5, 20, "BLACK");
-                addBall(ball[Number_Of_Balls]);
-                addText(text[Number_Of_Balls]);
-                Number_Of_Balls++;
-                
+            double x = MouseInfo.getPointerInfo().getLocation().getX() - window.getLocationOnScreen().x;
+            double y = MouseInfo.getPointerInfo().getLocation().getY() - window.getLocationOnScreen().y;
+            boolean overlap = false;
+            for (int i = 0; i < nodes.size(); i++){
+                if (nodes.get(i).doesOverlap(x, y)){
+                    overlap = true;
+                    break;
+                }
             }
-            s = checkDontOverlap(s, x, y);
-            if(s == Number_Of_Balls){
-                ball[Number_Of_Balls] = new Ball(x, y, 15, String.format("#%06x", random.nextInt(256*256*256)));
-                text[Number_Of_Balls] = new Text(String.valueOf(Number_Of_Balls), x-7.5, y+7.5, 20, "BLACK");
-                addBall(ball[Number_Of_Balls]);
-                addText(text[Number_Of_Balls]);
-                addedball = true;                     
-            }
-            if(addedball)
-            {
-                Number_Of_Balls++;
-                addedball = false;
-            }
-
+            if (overlap == true)
+                return;
+            Ball newBall = new Ball(x, y - 20, 15, String.format("#%06x", random.nextInt(256*256*256)));
+            newBall.text = new Text(String.valueOf(nodes.size()), x-7.5, y - 15, 20, "BLACK");
+            newBall.index = nodes.size();
+            adj.add(new HashSet<Ball>());
+            addBall(newBall);
+            addText(newBall.text);
+            nodes.add(newBall);
         }
         @Override
-        public void mouseEntered(MouseEvent e){
-            
-        }
+        public void mouseEntered(MouseEvent e){ }
         @Override
-        public void mouseExited(MouseEvent e){
-            
-        }
+        public void mouseExited(MouseEvent e){ }
         @Override
-        public void mousePressed(MouseEvent e){
-            
-        }
+        public void mousePressed(MouseEvent e){ }
         @Override
-        public void mouseReleased(MouseEvent e){
-            
-        }
+        public void mouseReleased(MouseEvent e){ }
     }
    private void initFX() {
 
@@ -592,22 +580,7 @@ public class GameArena
             removeList.add(r);
 		}
 	}
-    /**
-     * Calculates how many balls dont overlap with our ball that we want to put.
-     * @param dontOverlap integer how many balls dont overlap.
-     * @param x mouse x coordinates.
-     * @param y mouse y coordinates.
-     * @return integer how many balls dont overlap.
-     */
-    public int checkDontOverlap(int dontOverlap, double x, double y)
-    {
-        for(int i = 0; i < Number_Of_Balls; i++){
-            if(ball[i].ballDistChecker(x, y)){
-                dontOverlap++;
-            }
-        }
-        return dontOverlap;
-    }
+
   	/**
      * Update the window to reflect all graphical objects added to this GameArena.
      *

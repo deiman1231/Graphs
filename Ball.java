@@ -15,6 +15,8 @@ public class Ball // TODO: rename to node
     private double yPosition;           // The Y coordinate of this Ball
     private double size;                // The diameter of this Ball
     private String colour;              // The colour of this Ball
+    public Text text;
+    public int index;
                                        
 
     /**
@@ -80,7 +82,7 @@ public class Ball // TODO: rename to node
         return colour;
     }
 
-    /**
+    /** 
      * Changes the colour of this Ball to the given value.
      * 
      * @param c The new colour of this Ball. 
@@ -115,9 +117,9 @@ public class Ball // TODO: rename to node
      * @param ball1 Ball which we will check the distance.
      * @return true if we can, false we cannot.
      */
-    public boolean ballDistChecker(double x, double y)
+    public boolean doesOverlap(double x, double y)
     {
-        return (Math.abs(xPosition - x) > 50 || Math.abs(yPosition - y) > 30);
+        return Math.abs(xPosition - x) <= 50 && Math.abs(yPosition - y) <= 50;
     }
 
     /**

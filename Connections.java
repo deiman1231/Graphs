@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.util.*;
+import java.util.HashSet;
 
 public class Connections implements ActionListener
 {
@@ -13,7 +14,6 @@ public class Connections implements ActionListener
     private int count;
 
     public Connections(){
-
         arena = new GameArena(500,500);
         JFrame window = new JFrame("Connections");
         JPanel panel = new JPanel();
@@ -40,22 +40,34 @@ public class Connections implements ActionListener
     {
         String linkNameStart = textfield.getText();
         String linkNameEnd = textfield1.getText();
-        System.out.println(linkNameStart + " " + linkNameEnd);
         Ball linkStart = null;
         Ball linkEnd = null;
-
         for (int i = 0; i < arena.nodes.size(); i++){
-            System.out.println(arena.nodes.get(i).text.getText() + "?=" + linkNameStart);
             if (arena.nodes.get(i).text.getText().equals(linkNameStart))
                 linkStart = arena.nodes.get(i);
             if (arena.nodes.get(i).text.getText().equals(linkNameEnd))
                 linkEnd = arena.nodes.get(i);
         }
+        if(edgeExists(linkStart, linkEnd) == true)
+            return;
         if(e.getSource() == button){
             arena.adj.get(linkStart.index).add(linkEnd);
             arena.adj.get(linkEnd.index).add(linkStart);
             Line line = new Line(linkStart.getXPosition(), linkStart.getYPosition(), linkEnd.getXPosition(), linkEnd.getYPosition(), 5, "WHITE");
             arena.addLine(line);
         }
+    }
+    public boolean edgeExists(Ball start, Ball end)
+    {
+        
+        int x = start.index;
+        for(int i = 0; i < arena.nodes.size(); i++){
+            Iterator node1 = arena.adj.get(i).iterator();
+            while(node1.hasNext()){
+                if(node1.next() == end && i == x)
+                    return true;
+            }
+        }
+        return false;
     }
 }

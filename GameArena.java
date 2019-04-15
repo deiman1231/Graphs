@@ -47,8 +47,6 @@ public class GameArena
     private final static int MAXIMUM_OBJECTS = 100000;
     public List<Ball> nodes;
     public List<HashSet<Ball>> adj;
-
-    private boolean addedball = false;
     private Text text[] = new Text[MAXIMUM_OBJECTS];
 
     // Collections of primitives. These now relate 1:1 to JavaFX Nodes, since moving from AWT.

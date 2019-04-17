@@ -14,6 +14,8 @@ public class Connections implements ActionListener
     private JTextField textfield;
     private JTextField textfield1;
     private JTextField textfield2;
+    private JTextField textfield3;
+    private JTextField textfield4;
     public GameArena arena;
     private int count;
 
@@ -29,6 +31,8 @@ public class Connections implements ActionListener
         textfield = new JTextField("Nodes(start) number", 15);
         textfield1 = new JTextField("Nodes(end) number", 15);
         textfield2 = new JTextField("Get adjacent Nodes(number)", 15);
+        textfield3 = new JTextField("Start DFS from(number)", 15);
+        textfield4 = new JTextField("Start BFS from(number)", 15);
         FlowLayout f = new FlowLayout();
 
         button.addActionListener(this);
@@ -45,9 +49,11 @@ public class Connections implements ActionListener
         panel.add(textfield);
         panel.add(textfield1);
         panel.add(textfield2);
+        panel.add(textfield3);
+        panel.add(textfield4);
         window.setContentPane(panel);
 
-        window.setSize(300, 300);
+        window.setSize(300, 400);
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -56,6 +62,8 @@ public class Connections implements ActionListener
         String linkNameStart = textfield.getText();
         String linkNameEnd = textfield1.getText();
         String nodesNameAdj = textfield2.getText();
+        String nodesIndex = textfield3.getText();
+        String nodesIndex1 = textfield4.getText();
         Ball linkStart = null;
         Ball linkEnd = null;
         Ball adjNodes = null;
@@ -107,8 +115,21 @@ public class Connections implements ActionListener
                 Arrow arrow1 = new Arrow(linkStart.getXPosition()+20, linkStart.getYPosition()+20, linkEnd.getXPosition(), linkEnd.getYPosition(), 1, "WHITE", arena);
             }
         }
+        if(e.getSource() == button3){
+            int start = 0;
+            for(int i = 0; i < arena.nodes.size(); i++){
+                if(arena.nodes.get(i).text.getText().equals(nodesIndex))
+                    start = arena.nodes.get(i).index;
+            }
+            DFS(start);
+        }
         if(e.getSource() == button4){
-            BFS();
+            int start1 = 0;
+            for(int i = 0; i < arena.nodes.size(); i++){
+                if(arena.nodes.get(i).text.getText().equals(nodesIndex1))
+                    start1 = arena.nodes.get(i).index;
+            } 
+            BFS(start1);
         }
     }
     public boolean edgeExists(Ball start, Ball end)
@@ -123,21 +144,20 @@ public class Connections implements ActionListener
         }
         return false;
     }
-    public void BFS()
+    public void BFS(int nodeIndex)
     {
         boolean[] visited = new boolean[arena.nodes.size()]; 
         LinkedList<Integer> queue = new LinkedList<Integer>();
-        int x = 0;
   
-        visited[x]=true; 
-        queue.add(x); 
+        visited[nodeIndex]=true; 
+        queue.add(nodeIndex); 
   
         while (queue.size() != 0) 
         { 
-            x = queue.poll(); 
-            System.out.print(x+" "); 
+            nodeIndex = queue.poll(); 
+            System.out.print(nodeIndex+" "); 
   
-            Iterator<Ball> q = arena.adj.get(x).iterator(); 
+            Iterator<Ball> q = arena.adj.get(nodeIndex).iterator(); 
             while (q.hasNext()) 
             { 
                 Ball nextNode = q.next(); 
@@ -148,5 +168,23 @@ public class Connections implements ActionListener
                 } 
             } 
         }  
+    }
+    public void DFShelper(int nodeIndex, boolean[] visited)
+    {
+        visited[nodeIndex] = true; 
+        System.out.print(nodeIndex + " "); 
+  
+        Iterator<Ball> q = arena.adj.get(nodeIndex).iterator(); 
+        while (q.hasNext()) 
+        { 
+            Ball nextNode = q.next(); 
+            if (!visited[nextNode.index]) 
+                DFShelper(nextNode.index, visited); 
+        } 
+    }
+    public void DFS(int nodeIndex)
+    {
+        boolean[] visited = new boolean[arena.nodes.size()];
+        DFShelper(nodeIndex, visited);
     }
 }

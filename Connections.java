@@ -2,10 +2,12 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.util.*;
-import java.util.HashSet;
+import java.util.List;
+import javax.swing.Timer;
 
 public class Connections implements ActionListener
 {
+    //initializing variables
     private JButton button;
     private JButton button1;
     private JButton button2;
@@ -17,9 +19,13 @@ public class Connections implements ActionListener
     private JTextField textfield3;
     private JTextField textfield4;
     public GameArena arena;
-    private int count;
-
+    private List<Integer> dfsIndices;
+    private List<Integer> bfsIndices;
+    /**
+     * Constructor creates an instance of a Connection class and displays a window with option controls
+     */
     public Connections(){
+        //creates an instance of GameArena and button, actionlisteners in the option window
         arena = new GameArena(500,500);
         JFrame window = new JFrame("Connections");
         JPanel panel = new JPanel();
@@ -34,6 +40,8 @@ public class Connections implements ActionListener
         textfield3 = new JTextField("Start DFS from(number)", 15);
         textfield4 = new JTextField("Start BFS from(number)", 15);
         FlowLayout f = new FlowLayout();
+        dfsIndices = new ArrayList<Integer>();
+        bfsIndices = new ArrayList<Integer>();
 
         button.addActionListener(this);
         button1.addActionListener(this);
@@ -57,8 +65,10 @@ public class Connections implements ActionListener
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    //ActionListener method of the option window
     public void actionPerformed(ActionEvent e)
     {
+        //initializing variables
         String linkNameStart = textfield.getText();
         String linkNameEnd = textfield1.getText();
         String nodesNameAdj = textfield2.getText();
@@ -67,6 +77,7 @@ public class Connections implements ActionListener
         Ball linkStart = null;
         Ball linkEnd = null;
         Ball adjNodes = null;
+        //get adjacent nodes
         if(e.getSource() == button2){
             for (int i = 0; i < arena.nodes.size(); i++){
                 if(arena.nodes.get(i).text.getText().equals(nodesNameAdj))
@@ -82,6 +93,7 @@ public class Connections implements ActionListener
             }
             System.out.print("]");
         }
+        //connecting 2 nodes
         if(e.getSource() == button){
             for (int i = 0; i < arena.nodes.size(); i++){
                 if (arena.nodes.get(i).text.getText().equals(linkNameStart))
@@ -96,6 +108,7 @@ public class Connections implements ActionListener
             Line line = new Line(linkStart.getXPosition(), linkStart.getYPosition(), linkEnd.getXPosition(), linkEnd.getYPosition(), 1, "WHITE");
             arena.addLine(line);
         }
+        //direct connection of 2 nodes
         if(e.getSource() == button1){
             for (int i = 0; i < arena.nodes.size(); i++){
                 if (arena.nodes.get(i).text.getText().equals(linkNameStart))
@@ -115,6 +128,7 @@ public class Connections implements ActionListener
                 Arrow arrow1 = new Arrow(linkStart.getXPosition()+20, linkStart.getYPosition()+20, linkEnd.getXPosition(), linkEnd.getYPosition(), 1, "WHITE", arena);
             }
         }
+        //DFS of nodes
         if(e.getSource() == button3){
             int start = 0;
             for(int i = 0; i < arena.nodes.size(); i++){
@@ -122,7 +136,9 @@ public class Connections implements ActionListener
                     start = arena.nodes.get(i).index;
             }
             DFS(start);
+            Visualise(dfsIndices);
         }
+        //BFS of nodes
         if(e.getSource() == button4){
             int start1 = 0;
             for(int i = 0; i < arena.nodes.size(); i++){
@@ -130,8 +146,15 @@ public class Connections implements ActionListener
                     start1 = arena.nodes.get(i).index;
             } 
             BFS(start1);
+            Visualise(bfsIndices);
         }
     }
+    /**
+     * Checks if there exists an edge between 2 nodes
+     * 
+     * @param start start of the node
+     * @param end end of the node 
+    */ 
     public boolean edgeExists(Ball start, Ball end)
     {
         int x = start.index;
@@ -144,6 +167,10 @@ public class Connections implements ActionListener
         }
         return false;
     }
+    /**
+     * Breadth search traversal gets all the nodes of the search
+     * @param nodeIndex which node to start the traversal from. 
+     */
     public void BFS(int nodeIndex)
     {
         boolean[] visited = new boolean[arena.nodes.size()]; 
@@ -151,12 +178,11 @@ public class Connections implements ActionListener
   
         visited[nodeIndex]=true; 
         queue.add(nodeIndex); 
-  
         while (queue.size() != 0) 
         { 
             nodeIndex = queue.poll(); 
-            System.out.print(nodeIndex+" "); 
-  
+            System.out.print(nodeIndex+" ");
+            bfsIndices.add(nodeIndex);
             Iterator<Ball> q = arena.adj.get(nodeIndex).iterator(); 
             while (q.hasNext()) 
             { 
@@ -169,22 +195,57 @@ public class Connections implements ActionListener
             } 
         }  
     }
+    /**
+     * Depth search traversal helper gets all the nodes of the search
+     * @param nodeIndex which node to start the traversal from. 
+     * @param visited marks visited nodes.
+     */
     public void DFShelper(int nodeIndex, boolean[] visited)
     {
         visited[nodeIndex] = true; 
-        System.out.print(nodeIndex + " "); 
-  
+        System.out.print(nodeIndex + "+ ");
+        dfsIndices.add(nodeIndex);
         Iterator<Ball> q = arena.adj.get(nodeIndex).iterator(); 
         while (q.hasNext()) 
         { 
             Ball nextNode = q.next(); 
-            if (!visited[nextNode.index]) 
-                DFShelper(nextNode.index, visited); 
-        } 
+            if (!visited[nextNode.index]) {
+                DFShelper(nextNode.index, visited);
+            } 
+        }
     }
+    /**
+     * Depth search traversal gets all the nodes of the search
+     * @param nodeIndex which node to start the traversal from. 
+     */
     public void DFS(int nodeIndex)
     {
         boolean[] visited = new boolean[arena.nodes.size()];
         DFShelper(nodeIndex, visited);
+    }
+    /**
+     *Visualization of nodes in the GameArena for DFS and BFS
+     *@param indices list which indices we are coloring.
+     */
+    public void Visualise(List<Integer> indices)
+    {
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    String color;
+                    for(int i = 0; i < indices.size(); i++){
+                       color = arena.nodes.get(indices.get(i)).getColour();
+                       arena.nodes.get(indices.get(i)).setColour("WHITE");
+                       Thread.sleep(1000);
+                       arena.nodes.get(indices.get(i)).setColour(color);
+                    }
+                }
+                 catch(InterruptedException e){
+                 }
+                 indices.clear();
+            }
+        });  
+        t1.start();
     }
 }

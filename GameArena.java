@@ -136,13 +136,14 @@ public class GameArena
             }
         });
 	}
-    
+    // MouseListener and all its methods
     public class myMouseListener implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e){
             double x = MouseInfo.getPointerInfo().getLocation().getX() - window.getLocationOnScreen().x;
             double y = MouseInfo.getPointerInfo().getLocation().getY() - window.getLocationOnScreen().y;
             boolean overlap = false;
+            //checking that the balls wouldnt overlap
             for (int i = 0; i < nodes.size(); i++){
                 if (nodes.get(i).doesOverlap(x, y)){
                     overlap = true;
@@ -151,6 +152,7 @@ public class GameArena
             }
             if (overlap == true)
                 return;
+            //adding balls
             Ball newBall = new Ball(x, y - 20, 15, String.format("#%06x", random.nextInt(256*256*256)));
             newBall.text = new Text(String.valueOf(nodes.size()), x-7.5, y - 15, 20, "BLACK");
             newBall.index = nodes.size();
